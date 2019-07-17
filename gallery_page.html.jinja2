@@ -13,6 +13,10 @@ body {
   color: #CCC;
 }
 
+.lightboxgallery-gallery {
+  max-width: 100%;
+}
+
 a:link {
   color: #CCC;
 }
@@ -40,9 +44,7 @@ a:visited, a:hover, a:active {
 <body>
 
 {% if dirs %}
-
-<h3>Subdirectories:</h3>
-
+<br>
 <div class="cards">
 {% for dir in dirs %}
 <div class="dir"><a href="{{ dir }}/index.html"><i class="fas fa-folder-open fa-4x"></i><br>{{ dir }}</a></div>
@@ -51,9 +53,8 @@ a:visited, a:hover, a:active {
 
 {% if items %}
 <hr />
-
-<h3>Images:</h3>
 {% endif %}
+
 {% endif %}
 
 <div class="lightboxgallery-gallery clearfix">
