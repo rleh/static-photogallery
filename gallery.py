@@ -12,6 +12,8 @@ parser = argparse.ArgumentParser(description='Statically generated photogallery'
 parser.add_argument('source', type=str, help='Source directory of images.')
 parser.add_argument('-o', '--output', type=str, default='./html/',
 	help='Destination directory for generated HTML and thumbnails.')
+parser.add_argument('-s', '--static', type=str, default="",
+	help='Web URL (absolute path) to static folder.')
 args = parser.parse_args()
 
 GalleryItem = collections.namedtuple('GalleryItem', 'name dir path thumbnail_small thumbnail_large')
@@ -22,6 +24,7 @@ rootpath = args.source
 output_path = args.output + '/'
 output_static_path = os.path.join(output_path, 'static')
 output_thumbnail_path = output_path
+web_static_path = args.static
 
 def recurse_files(path):
     item_list = []
@@ -40,7 +43,10 @@ def recurse_files(path):
     generate_gallery_page(path, item_list, dir_list)
 
 def generate_gallery_page(path, item_list, dir_list):
-    static_relpath = os.path.relpath(output_static_path, path)
+    if web_static_path is "":
+        static_relpath = os.path.relpath(output_static_path, path)
+    else:
+        static_relpath = web_static_path
     template = templateEnv.get_template('gallery_page.html.jinja2')
     os.makedirs(os.path.join(output_path, os.path.relpath(path, rootpath)), exist_ok=True)
 
