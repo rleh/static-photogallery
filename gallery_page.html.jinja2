@@ -29,9 +29,11 @@ a:visited, a:hover, a:active {
 }
 .cards .dir {
   margin: 10px;
-  max-width: 23vw;
+  width: 10vw;
   text-align: center;
   align-content: center;
+  word-wrap: break-word;
+  font-size: 90%;
 }
 </style>
 </head>
@@ -43,7 +45,7 @@ a:visited, a:hover, a:active {
 
 <div class="cards">
 {% for dir in dirs %}
-<div class="dir"><a href="{{ dir }}/index.html"><i class="fas fa-folder-open"><br />{{ dir }}</i></a></div>
+<div class="dir"><a href="{{ dir }}/index.html"><i class="fas fa-folder fa-4x"></i><br>{{ dir }}</a></div>
 {% endfor %}
 </div>
 
