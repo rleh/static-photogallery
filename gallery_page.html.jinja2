@@ -33,11 +33,11 @@ body {
 <div class="lightboxgallery-gallery clearfix">
 
 {% for item in items %}
-<a class="lightboxgallery-gallery-item" target="_blank" href="{{ item.thumbnail_large }}" data-title="{{ item.name }} (a::data-title)">
+<a class="lightboxgallery-gallery-item" target="_blank" href="{{ item.thumbnail_large }}" data-title="<a href='{{ original_path }}{{ item.path }}'>Original image: {{ item.name }}</a>">
 <div>
-<img src="{{ item.thumbnail_small }}" title="{{ item.name }} (img::title)" alt="{{ item.name }} (img::alt)">
+<img src="{{ item.thumbnail_small }}" title="{{ item.name }}" alt="{{ item.name }}">
 <div class="lightboxgallery-gallery-item-content">
-<span class="lightboxgallery-gallery-item-title">{{ item.name }} <p href="#">Original: {{ item.path }}</p> (div::span)</span>
+<span class="lightboxgallery-gallery-item-title">{{ item.name }}</span>
 </div>
 </div>
 </a>

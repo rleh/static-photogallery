@@ -10,10 +10,14 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Statically generated photogallery')
 parser.add_argument('source', type=str, help='Source directory of images.')
-parser.add_argument('-o', '--output', type=str, default='./html/',
-	help='Destination directory for generated HTML and thumbnails.')
+parser.add_argument('-d', '--destination', type=str, default='./html/',
+    help='Destination directory for generated HTML and thumbnails.')
 parser.add_argument('-s', '--static', type=str, default="",
-	help='Web URL (absolute path) to static folder.')
+    help='Web URL (absolute path) to static folder.')
+parser.add_argument('-o', '--original', type=str, default="",
+    help='Web URL (absolute path) to original images.')
+parser.add_argument('-j', '--jobs', type=int, default=8,
+    help='Specifies the number of thumbnail generation jobs to run simultaneously.')
 args = parser.parse_args()
 
 GalleryItem = collections.namedtuple('GalleryItem', 'name dir path thumbnail_small thumbnail_large')
@@ -21,10 +25,11 @@ templateLoader = jinja2.FileSystemLoader(searchpath="./")
 templateEnv = jinja2.Environment(loader=templateLoader)
 
 rootpath = args.source
-output_path = args.output + '/'
+output_path = args.destination + '/'
 output_static_path = os.path.join(output_path, 'static')
 output_thumbnail_path = output_path
 web_static_path = args.static
+web_original_path = args.original
 
 def recurse_files(path):
     item_list = []
@@ -59,7 +64,14 @@ def generate_gallery_page(path, item_list, dir_list):
 
     filename = os.path.join(output_path, os.path.relpath(path, rootpath), 'index.html')
     with open(filename, 'w') as fh:
-        fh.write(template.render(items=item_list_html, dirs=dir_list, page_title=path, static_path=static_relpath))
+        fh.write(template.render(
+            items=item_list_html,
+            dirs=dir_list,
+            page_title=path,
+            static_path=static_relpath,
+            original_path=web_original_path,
+            )
+        )
 
 
 ThumbnailItem = collections.namedtuple('ThumbnailItem', 'src small large')
@@ -75,20 +87,24 @@ def generate_thumbnail(image):
     return small, large
 
 def process_thumbnail(param):
-	# TODO: Check if thumbnail already exists
+    # TODO: Check if thumbnail already exists
     try:
         im = Image.open(param.src)
-        im.thumbnail((1920,1200))
-        im.save(param.large)
-        im.thumbnail((400,250))
-        im.save(param.small)
+        if im.mode in ('RGBA', 'LA') or (im.mode == 'P' and 'transparency' in im.info):
+            # Need to convert to RGBA if LA format due to a bug in PIL (http://stackoverflow.com/a/1963146)
+            alpha = im.convert('RGBA').getchannel('A')
+            im = im.convert('RGB')
+        im.thumbnail((1920,1200),Image.ANTIALIAS)
+        im.save(param.large,optimize=True,quality=85)
+        im.thumbnail((400,250),Image.ANTIALIAS)
+        im.save(param.small,optimize=True,quality=70)
         return True
     except Exception as e:
         print('Error while creating thumbnail for image {}: {}'.format(param.src, str(e)))
         return e
 
 def batch_process_thumbnails():
-    pool = Pool(8)
+    pool = Pool(args.jobs)
     results = pool.map(process_thumbnail, thumbnail_list)
 
 def copy_static_files():
