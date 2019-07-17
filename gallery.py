@@ -34,7 +34,7 @@ web_original_path = args.original
 def recurse_files(path):
     item_list = []
     dir_list = []
-    for inode in glob.iglob(path + '/**', recursive=False):
+    for inode in sorted(glob.iglob(path + '/**', recursive=False)):
         if os.path.isfile(inode):
             thumbnail, thumbnail_large = generate_thumbnail(inode)
             item_list.append(GalleryItem(os.path.relpath(inode, path), False, inode, thumbnail, thumbnail_large))
