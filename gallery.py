@@ -36,7 +36,9 @@ web_original_path = args.original
 def recurse_files(path):
     item_list = []
     dir_list = []
+    hash_list = []
     for inode in sorted(glob.iglob(path + '/**', recursive=False)):
+        hash_list.append((os.path.basename(inode), os.path.getmtime(inode)))
         if os.path.isfile(inode):
             thumbnail, thumbnail_large = generate_thumbnail(inode)
             item_list.append(GalleryItem(os.path.relpath(inode, path), False, inode, thumbnail, thumbnail_large))
@@ -46,10 +48,9 @@ def recurse_files(path):
             recurse_files(inode)
         else:
             print(inode + " is neither a file nor a directory. Skipping...")
-    #print("OUT: " + path + " -> " + " | ".join(str(i) for i in item_list))
-    generate_gallery_page(path, item_list, dir_list)
+    generate_gallery_page(path, item_list, dir_list, str(hash(frozenset(hash_list))))
 
-def generate_gallery_page(path, item_list, dir_list):
+def generate_gallery_page(path, item_list, dir_list, directory_hash):
     if web_static_path is "":
         static_relpath = os.path.relpath(output_static_path, path)
     else:
@@ -86,11 +87,11 @@ def generate_thumbnail(image):
     os.makedirs(directory, exist_ok=True)
     small = destination + '.small.jpg'
     large = destination + '.large.jpg'
-    thumbnail_list.append(ThumbnailItem(image, small, large))
+    if not os.path.isfile(small):
+        thumbnail_list.append(ThumbnailItem(image, small, large))
     return small, large
 
 def process_thumbnail(param):
-    # TODO: Check if thumbnail already exists
     try:
         im = Image.open(param.src)
         if im.mode in ('RGBA', 'LA') or (im.mode == 'P' and 'transparency' in im.info):
@@ -104,6 +105,7 @@ def process_thumbnail(param):
         return True
     except Exception as e:
         print('Error while creating thumbnail for image {}: {}'.format(param.src, str(e)))
+        shutil.copyfile('./static/no-thumbnail.jpg', param.small)
         return e
 
 def batch_process_thumbnails():
