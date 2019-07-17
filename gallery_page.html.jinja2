@@ -5,10 +5,33 @@
 <title>Gallery || {{ page_title }}</title>
 <link rel="stylesheet" href="{{ static_path }}/lightboxgallery-min.css">
 <link rel="stylesheet" href="{{ static_path }}/style.css">
+<link href="{{ static_path }}/fa/css/fontawesome.min.css" rel="stylesheet">
+<link href="{{ static_path }}/fa/css/solid.min.css" rel="stylesheet">
 <style>
 body {
   background-color: #111;
+  color: #CCC;
+}
+
+a:link {
+  color: #CCC;
+}
+a:visited, a:hover, a:active {
   color: #EEE;
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  flex-direction: row;
+  max-height: 100vh;
+}
+.cards .dir {
+  margin: 10px;
+  max-width: 23vw;
+  text-align: center;
+  align-content: center;
 }
 </style>
 </head>
@@ -17,11 +40,12 @@ body {
 {% if dirs %}
 
 <h3>Subdirectories:</h3>
-<ul>
+
+<div class="cards">
 {% for dir in dirs %}
-<li><a href="{{ dir }}/index.html">{{ dir }}</a></li>
+<div class="dir"><a href="{{ dir }}/index.html"><i class="fas fa-folder-open"><br />{{ dir }}</i></a></div>
 {% endfor %}
-</ul>
+</div>
 
 {% if items %}
 <hr />
