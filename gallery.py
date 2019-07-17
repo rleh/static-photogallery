@@ -5,7 +5,7 @@ import collections
 import jinja2
 import shutil
 from PIL import Image
-from multiprocessing import Pool 
+from multiprocessing import Pool
 import argparse
 
 parser = argparse.ArgumentParser(description='Statically generated photogallery')
@@ -57,7 +57,7 @@ def generate_gallery_page(path, item_list, dir_list):
 
     item_list_html = []
     for item in item_list:
-        item_path = os.path.join(rootpath, os.path.relpath(item.path, path))
+        item_path = os.path.relpath(item.path, rootpath)
         thumbnail_small = os.path.relpath(item.thumbnail_small, path)
         thumbnail_large = os.path.relpath(item.thumbnail_large, path)
         item_list_html.append(GalleryItem(item.name, False, item_path, os.path.basename(thumbnail_small), os.path.basename(thumbnail_large)))
