@@ -87,7 +87,7 @@ def generate_thumbnail(image):
     os.makedirs(directory, exist_ok=True)
     small = destination + '.small.jpg'
     large = destination + '.large.jpg'
-    if not os.path.isfile(small):
+    if (not os.path.isfile(small)) or (not os.path.isfile(large)):
         thumbnail_list.append(ThumbnailItem(image, small, large))
     return small, large
 
@@ -106,6 +106,7 @@ def process_thumbnail(param):
     except Exception as e:
         print('Error while creating thumbnail for image {}: {}'.format(param.src, str(e)))
         shutil.copyfile('./static/no-thumbnail.jpg', param.small)
+        shutil.copyfile('./static/no-thumbnail.jpg', param.large)
         return e
 
 def batch_process_thumbnails():
