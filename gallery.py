@@ -18,6 +18,8 @@ parser.add_argument('-o', '--original', type=str, default="",
     help='Web URL (absolute path) to original images.')
 parser.add_argument('-j', '--jobs', type=int, default=8,
     help='Specifies the number of thumbnail generation jobs to run simultaneously.')
+parser.add_argument('-t', '--title', type=str, default="Static Photogallery",
+    help='Prefix for the HTML page title.')
 args = parser.parse_args()
 
 GalleryItem = collections.namedtuple('GalleryItem', 'name dir path thumbnail_small thumbnail_large')
@@ -67,7 +69,8 @@ def generate_gallery_page(path, item_list, dir_list):
         fh.write(template.render(
             items=item_list_html,
             dirs=dir_list,
-            page_title=path,
+            page_title=os.path.basename(path),
+            page_title_prefix=args.title,
             static_path=static_relpath,
             original_path=web_original_path,
             )
