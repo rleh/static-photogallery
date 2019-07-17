@@ -6,15 +6,20 @@ import jinja2
 import shutil
 from PIL import Image
 from multiprocessing import Pool 
+import argparse
+
+parser = argparse.ArgumentParser(description='Statically generated photogallery')
+parser.add_argument('source', type=str, help='Source directory of images.')
+parser.add_argument('-o', '--output', type=str, default='./html/',
+	help='Destination directory for generated HTML and thumbnails.')
+args = parser.parse_args()
 
 GalleryItem = collections.namedtuple('GalleryItem', 'name dir path thumbnail_small thumbnail_large')
 templateLoader = jinja2.FileSystemLoader(searchpath="./")
 templateEnv = jinja2.Environment(loader=templateLoader)
 
-rootpath = './example/'
-static_path = './static/'
-
-output_path = './html/'
+rootpath = args.source
+output_path = args.output + '/'
 output_static_path = os.path.join(output_path, 'static')
 output_thumbnail_path = output_path
 
@@ -84,7 +89,7 @@ def copy_static_files():
     destination = output_static_path
     if os.path.exists(destination):
         shutil.rmtree(destination)
-    shutil.copytree(static_path, destination)
+    shutil.copytree('./static/', destination)
 
 if __name__ == "__main__":
     recurse_files(rootpath)
