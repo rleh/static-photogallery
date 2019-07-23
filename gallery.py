@@ -4,7 +4,7 @@ import glob, os
 import collections
 import jinja2
 import shutil
-from PIL import Image
+from PIL import Image, ExifTags
 from multiprocessing import Pool
 import argparse
 
