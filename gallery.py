@@ -98,6 +98,18 @@ def process_thumbnail(param):
             # Need to convert to RGBA if LA format due to a bug in PIL (http://stackoverflow.com/a/1963146)
             alpha = im.convert('RGBA').getchannel('A')
             im = im.convert('RGB')
+
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation] == 'Orientation': break
+        exif = dict(im._getexif().items())
+
+        if exif[orientation] == 3:
+            im = im.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            im = im.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            im = im.rotate(90, expand=True)
+
         im.thumbnail((1920,1200),Image.ANTIALIAS)
         im.save(param.large,optimize=True,quality=85)
         im.thumbnail((400,250),Image.ANTIALIAS)
