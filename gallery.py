@@ -99,16 +99,18 @@ def process_thumbnail(param):
             alpha = im.convert('RGBA').getchannel('A')
             im = im.convert('RGB')
 
-        for orientation in ExifTags.TAGS.keys():
-            if ExifTags.TAGS[orientation] == 'Orientation': break
-        exif = dict(im._getexif().items())
-
-        if exif[orientation] == 3:
-            im = im.rotate(180, expand=True)
-        elif exif[orientation] == 6:
-            im = im.rotate(270, expand=True)
-        elif exif[orientation] == 8:
-            im = im.rotate(90, expand=True)
+        try:
+            for orientation in ExifTags.TAGS.keys():
+                if ExifTags.TAGS[orientation] == 'Orientation': break
+            exif = dict(im._getexif().items())
+            if exif[orientation] == 3:
+                im = im.rotate(180, expand=True)
+            elif exif[orientation] == 6:
+                im = im.rotate(270, expand=True)
+            elif exif[orientation] == 8:
+                im = im.rotate(90, expand=True)
+        except Exception as e:
+            print('Error while rotate image {} according to EXIF data: {}'.format(param.src, str(e)))
 
         im.thumbnail((1920,1200),Image.ANTIALIAS)
         im.save(param.large,optimize=True,quality=85)
